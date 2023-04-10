@@ -45,11 +45,11 @@ class Controller:
 
     def read_input(self):
         while True:
-            raw_data = self.connection.read_until(b"\r\n")
-            raw_data_str = raw_data.decode("utf-8").replace("\n", "").replace("\r", "").strip()
-            raw_data_split = raw_data_str.split(" ")
-
             try:
+                raw_data = self.connection.read_until(b"\r\n")
+                raw_data_str = raw_data.decode("utf-8").replace("\n", "").replace("\r", "").strip()
+                raw_data_split = raw_data_str.split(" ")
+
                 raw_data_dict = {}
                 for raw_data in raw_data_split:
                     name_value = raw_data.split(":")

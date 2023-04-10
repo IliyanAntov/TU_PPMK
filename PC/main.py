@@ -38,7 +38,7 @@ def main():
 
         x_move = numpy.interp(controller.x, [0, 4096], [-2048, 2048])
         y_move = numpy.interp(controller.y, [0, 4096], [-2048, 2048])
-        player.move((x_move/50), -(y_move/50), frame_time)
+        player.move(x_move, -y_move, frame_time)
 
         if keys[pygame.K_a]:
             player.move(-50, 0, frame_time)
