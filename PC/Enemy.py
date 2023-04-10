@@ -6,13 +6,13 @@ from Game import Game
 
 
 class Enemy(pygame.sprite.Sprite):
-    size = (64, 64)
+    size = (16*4, 10*4)
     default_pos = (0, 0)
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        enemy_image = pygame.image.load(os.path.join('imgs', 'player.png'))
+        enemy_image = pygame.image.load(os.path.join('imgs', 'enemy.png'))
         self.size = Enemy.size
         self.image = pygame.transform.scale(enemy_image, self.size)
 

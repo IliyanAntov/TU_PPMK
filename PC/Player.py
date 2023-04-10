@@ -3,18 +3,17 @@ import os
 import pygame
 
 from Game import Game
+from Projectile import Projectile
 
 
 class Player(pygame.sprite.Sprite):
 
     def __init__(self):
-        self.size = (64, 64)
+        self.size = (16*4, 16*4)
         self.default_pos = (368, 700)
         self.speed = 400
         self.deadzone = (-50, 50)
-
-        self.velocity = pygame.math.Vector2(0, 0)
-        self.acceleration = pygame.math.Vector2(0, -0.2)
+        self.projectiles = []
 
         pygame.sprite.Sprite.__init__(self)
 
@@ -26,8 +25,14 @@ class Player(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(self.default_pos[0], self.default_pos[1])
         self.rect.topleft = self.pos.x, self.pos.y
 
-    def draw(self):
+    def draw(self, frame_time):
         Game.screen.blit(self.image, self.rect)
+        for projectile in list(self.projectiles):
+
+            projectile_destroyed = projectile.move(frame_time)
+            if projectile_destroyed:
+                self.projectiles.remove(projectile)
+            projectile.draw()
 
     def move(self, dx, dy, frame_time):
         if self.deadzone[0] < dx < self.deadzone[1]:
@@ -54,3 +59,7 @@ class Player(pygame.sprite.Sprite):
             self.pos.y = (Game.display_size.y - self.rect.height)
 
         self.rect.topleft = self.pos
+
+    def shoot(self):
+        projectile = Projectile(self.rect.midtop[0], self.rect.midtop[1])
+        self.projectiles.append(projectile)

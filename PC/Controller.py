@@ -3,8 +3,10 @@ import tkinter
 from tkinter import *
 from tkinter.ttk import Combobox
 
+import pygame
 import serial
 import serial.tools.list_ports
+from serial import Serial
 
 
 class Controller:
@@ -15,6 +17,7 @@ class Controller:
         self.but1 = 0
         self.but2 = 0
         self.butj = 0
+        self.stop = False
 
     def connect(self):
         dialog_root = Tk()
@@ -43,8 +46,13 @@ class Controller:
 
         self.connection = serial_connection
 
+    def disconnect(self):
+        self.connection.close()
+
     def read_input(self):
         while True:
+            if self.stop:
+                return
             try:
                 raw_data = self.connection.read_until(b"\r\n")
                 raw_data_str = raw_data.decode("utf-8").replace("\n", "").replace("\r", "").strip()
