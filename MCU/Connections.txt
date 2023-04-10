@@ -1,0 +1,13 @@
+Booster pack:
+	Joystick, hor(x) - J1.2
+	Joystick, ver(y) - J3.26
+	Joystick, select button - J1.5
+	Button1, I/O - J4.33
+	Button2 I/O - J4.32
+
+Main board:
+	Joystick, hor(x) - J1.2 = P9.2
+	Joystick, ver(y) - J3.26 = P8.7
+	Joystick, select button - J1.5 = P3.2
+	Button1, I/O - J4.33 = P3.0
+	Button2 I/O - J4.32 = P3.1
