@@ -29,7 +29,7 @@ class Player(pygame.sprite.Sprite):
         Game.screen.blit(self.image, self.rect)
         for projectile in list(self.projectiles):
 
-            projectile_destroyed = projectile.move(frame_time)
+            projectile_destroyed = projectile.move(frame_time, "up")
             if projectile_destroyed:
                 self.projectiles.remove(projectile)
             projectile.draw()
