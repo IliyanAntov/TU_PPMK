@@ -8,24 +8,23 @@ from Projectile import Projectile
 
 
 class Enemy(pygame.sprite.Sprite):
+    image = pygame.image.load(os.path.join('imgs', 'enemy.png'))
+    default_speed = 200
     size = (16*4, 10*4)
     default_pos = (0, 0)
-    min_x = Game.display_size.x / 4
-    max_x = min_x * 3
-    min_y = 0
-    max_y = 3 * Game.display_size.y / 4
-    movement_speed = 20
+    min_x = Game.display_size.x / 5
 
-    def __init__(self):
+    def __init__(self, spawn_x, spawn_y):
         pygame.sprite.Sprite.__init__(self)
 
-        enemy_image = pygame.image.load(os.path.join('imgs', 'enemy.png'))
         self.size = Enemy.size
-        self.image = pygame.transform.scale(enemy_image, self.size)
+        self.image = pygame.transform.scale(Enemy.image, self.size)
+        self.speed = Enemy.default_speed
 
         self.rect = self.image.get_rect()
-        self.rect.left = Enemy.default_pos[0]
-        self.rect.top = Enemy.default_pos[1]
+        self.rect.topleft = (spawn_x, spawn_y)
+
+        self.pos = pygame.math.Vector2(self.rect.x, self.rect.y)
 
         self.projectiles = []
 
@@ -46,11 +45,23 @@ class Enemy(pygame.sprite.Sprite):
         Game.screen.blit(self.image, self.rect)
 
     def move(self, dx, dy, frame_time):
-        new_x = self.rect.x + dx * frame_time / 100
-        new_y = self.rect.y + dy * frame_time / 100
-        if 0 <= new_x <= (Game.display_size.x - self.rect.width):
-            self.rect.x = new_x
-        if 0 <= new_y <= (Game.display_size.y - self.rect.height):
-            self.rect.y = new_y
+        movement_vector = pygame.math.Vector2(dx, dy)
+        if movement_vector.length() == 0:
+            return
 
+        movement_vector.scale_to_length(self.speed*(frame_time/1000))
+        self.pos.x += movement_vector.x
+        self.pos.y += movement_vector.y
+
+        if self.pos.x < 0:
+            self.pos.x = 0
+        elif self.pos.x > (Game.display_size.x - self.rect.width):
+            self.pos.x = (Game.display_size.x - self.rect.width)
+
+        if self.pos.y < 0:
+            self.pos.y = 0
+        elif self.pos.y > (Game.display_size.y - self.rect.height):
+            self.pos.y = (Game.display_size.y - self.rect.height)
+
+        self.rect.topleft = self.pos
 

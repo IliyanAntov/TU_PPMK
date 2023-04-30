@@ -15,11 +15,10 @@ class Projectile:
     def draw(self):
         pygame.draw.rect(Game.screen, self.color, self.rect)
 
-    def move(self, frame_time, dir):
-
-        if dir == "up":
+    def move(self, frame_time, direction):
+        if direction == "up":
             self.pos.y -= self.speed * (frame_time/1000)
-        elif dir == "down":
+        elif direction == "down":
             self.pos.y += self.speed * (frame_time / 1000)
 
         if self.pos.y < 0:

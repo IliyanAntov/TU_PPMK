@@ -1,10 +1,5 @@
-import threading
-
-import numpy
 import pygame
 
-from Controller import Controller
-from Enemy import Enemy
 from Game import Game
 from Level import Level
 from Player import Player
@@ -26,8 +21,24 @@ def main():
     while True:
         frame_time = clock.tick(Game.fps)
 
-        events = pygame.event.get()
+        level.move_enemies(frame_time)
+        level.draw(frame_time)
+        player.draw(frame_time)
+        pygame.display.update()
 
+        if level.check_player_hit(player):
+            Game.score = 0
+
+            Game.screen.fill((0, 0, 0))
+            level = Level(1)
+            level.draw(frame_time)
+            player = Player()
+            player.draw(frame_time)
+            pygame.display.update()
+
+            Level.game_over_dialog()
+
+        events = pygame.event.get()
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -48,7 +59,6 @@ def main():
         # player.move(x_move, -y_move, frame_time)
 
         keys = pygame.key.get_pressed()
-
         if keys[pygame.K_a]:
             player.move(-50, 0, frame_time)
         if keys[pygame.K_d]:
@@ -59,21 +69,14 @@ def main():
             player.move(0, -50, frame_time)
 
         Game.screen.fill((0, 0, 0))
+
         for projectile in player.projectiles:
-            hit = level.check_projectile_collisions(projectile)
+            hit = level.check_enemy_hit(projectile)
             if hit:
                 player.projectiles.remove(projectile)
 
-        if level.check_player_collision(player):
-            level = Level(level.num)
-            Game.score = 0
-
         if level.check_completion():
             level = Level(level.num + 1)
-        level.move_enemies(frame_time)
-        level.draw(frame_time)
-        player.draw(frame_time)
-        pygame.display.update()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,10 @@
 import copy
 import itertools
 import math
+import tkinter
+from tkinter import Tk, Button
+
+import pygame
 
 from Enemy import Enemy
 from Game import Game
@@ -11,99 +15,88 @@ class Level:
 
     def __init__(self, number):
         self.num = number
-        self.enemies = []
         self.enemy_row_length = 5
         self.movement_direction = "right"
-        self.spawn_enemies()
+        self.enemies = self.spawn_enemies()
 
     def draw(self, frame_time):
         for enemy in itertools.chain.from_iterable(self.enemies):
             enemy.draw(frame_time)
 
     def spawn_enemies(self):
+        enemies = []
         for i in range(self.num):
-            enemy = Enemy()
-            self.enemies.append([])
+            enemies.append([])
             current_x = Enemy.min_x
-            current_y = i * (enemy.rect.height + Level.enemy_offset)
+            current_y = i * (Enemy.size[1] + Level.enemy_offset)
 
             for j in range(self.enemy_row_length):
-                enemy = Enemy()
 
-                enemy.rect.x = current_x
-                enemy.rect.y = current_y
+                enemy = Enemy(spawn_x=current_x,
+                              spawn_y=current_y)
 
-                current_x += enemy.rect.width + Level.enemy_offset
+                enemies[i].append(enemy)
 
-                self.enemies[i].append(enemy)
+                current_x += Enemy.size[0] + Level.enemy_offset
+
+        return enemies
 
     def move_enemies(self, frame_time):
-
         if self.movement_direction == "right":
-            # If the enemies have reached the end of the screen, move them one row down
-            last_enemy = self._find_last_enemy()
-            last_enemy.move(dx=Enemy.movement_speed,
-                            dy=0,
-                            frame_time=frame_time)
+            rightmost_enemy_x = self._find_rightmost_enemy_x()
+            rightmost_enemy = Enemy(spawn_x=rightmost_enemy_x,
+                                    spawn_y=0)
 
-            if last_enemy.rect.right >= Game.display_size.x:
+            rightmost_enemy.move(dx=Enemy.default_speed,
+                                 dy=0,
+                                 frame_time=frame_time)
+
+            # If the enemies have reached the end of the screen, move them one row down
+            if rightmost_enemy.rect.right >= Game.display_size.x:
                 for enemy in itertools.chain.from_iterable(self.enemies):
-                    enemy.rect.top += (enemy.rect.height + Level.enemy_offset)
+                    enemy.pos.y += Enemy.size[1]
+                    enemy.rect.top = enemy.pos.y
                 self.movement_direction = "left"
+
             # If the enemies have not reached the end of the screen, move them right
             else:
                 for enemy in itertools.chain.from_iterable(self.enemies):
-                    enemy.move(dx=Enemy.movement_speed,
+                    enemy.move(dx=Enemy.default_speed,
                                dy=0,
                                frame_time=frame_time)
 
         elif self.movement_direction == "left":
-            first_enemy = self._find_first_enemy()
-            first_enemy.move(dx=-Enemy.movement_speed,
-                             dy=0,
-                             frame_time=frame_time)
+            rightmost_enemy_x = self._find_leftmost_enemy_x()
+            leftmost_enemy = Enemy(spawn_x=rightmost_enemy_x,
+                                   spawn_y=0)
+
+            leftmost_enemy.move(dx=Enemy.default_speed,
+                                dy=0,
+                                frame_time=frame_time)
 
             # If the enemies have reached the end of the screen, move them one row down
-            if first_enemy.rect.left <= 0:
+            if leftmost_enemy.rect.left <= 0:
                 for enemy in itertools.chain.from_iterable(self.enemies):
-                    enemy.rect.top += (enemy.rect.height + Level.enemy_offset)
+                    enemy.pos.y += Enemy.size[1]
+                    enemy.rect.top = enemy.pos.y
                     self.movement_direction = "right"
+
             # If the enemies have not reached the end of the screen, move them right
             else:
                 for enemy in itertools.chain.from_iterable(self.enemies):
-                    enemy.move(dx=-Enemy.movement_speed,
+                    enemy.move(dx=-Enemy.default_speed,
                                dy=0,
                                frame_time=frame_time)
 
-    def _find_first_enemy(self):
-        first_enemy_found = None
-        for i in range(len(self.enemies)):
-            if not self.enemies[i]:
-                continue
-            first_enemy = Enemy()
-            first_enemy.rect.x = self.enemies[i][0].rect.x
-            first_enemy.rect.y = self.enemies[i][0].rect.y
+    def _find_leftmost_enemy_x(self):
+        min_x = min(enemy.rect.x for enemy in itertools.chain.from_iterable(self.enemies))
+        return min_x
 
-            if first_enemy_found is None or first_enemy.rect.x < first_enemy_found.rect.x:
-                first_enemy_found = first_enemy
+    def _find_rightmost_enemy_x(self):
+        max_x = max(enemy.rect.x for enemy in itertools.chain.from_iterable(self.enemies))
+        return max_x
 
-        return first_enemy_found
-
-    def _find_last_enemy(self):
-        last_enemy_found = None
-        for i in range(len(self.enemies)):
-            if not self.enemies[i]:
-                continue
-            last_enemy = Enemy()
-            last_enemy.rect.x = self.enemies[i][-1].rect.x
-            last_enemy.rect.y = self.enemies[i][-1].rect.y
-
-            if last_enemy_found is None or last_enemy.rect.x > last_enemy_found.rect.x:
-                last_enemy_found = last_enemy
-
-        return last_enemy_found
-
-    def check_projectile_collisions(self, projectile):
+    def check_enemy_hit(self, projectile):
         for i in range(len(self.enemies)):
             for j in range(len(self.enemies[i])):
                 if self.enemies[i][j].rect.colliderect(projectile):
@@ -111,7 +104,7 @@ class Level:
                     return True
         return False
 
-    def check_player_collision(self, player):
+    def check_player_hit(self, player):
         for i in range(len(self.enemies)):
             for j in range(len(self.enemies[i])):
                 if self.enemies[i][j].rect.colliderect(player):
@@ -129,3 +122,29 @@ class Level:
             return True
         else:
             return False
+
+    @staticmethod
+    def game_over_dialog():
+        dialog_root = Tk()
+        dialog_root.title("Game Over!")
+        dialog_root.geometry("400x100")
+
+        game_over = tkinter.Label(dialog_root, text="Game over! Try again?", font=("Arial", 22))
+        retry_button = Button(dialog_root, text="Retry", command=(lambda: Level.retry(dialog_root)))
+        quit_button = Button(dialog_root, text="Quit", command=(lambda: Level.game_over(dialog_root)))
+
+        game_over.pack(padx=10, fill=tkinter.X, expand=True)
+        retry_button.pack(padx=10, pady=10, fill=tkinter.X, side=tkinter.LEFT, expand=True)
+        quit_button.pack(padx=10, pady=10, fill=tkinter.X, side=tkinter.RIGHT, expand=True)
+
+        dialog_root.mainloop()
+
+    @staticmethod
+    def retry(tkinter_root):
+        tkinter_root.destroy()
+
+    @staticmethod
+    def game_over(tkinter_root):
+        tkinter_root.quit()
+        pygame.quit()
+        exit()

@@ -12,3 +12,5 @@ class Game:
     enemy_shoot_chance = 0.001
 
     screen = pygame.display.set_mode(display_size)
+
+

@@ -1,12 +1,9 @@
-import io
 import tkinter
 from tkinter import *
 from tkinter.ttk import Combobox
 
-import pygame
 import serial
 import serial.tools.list_ports
-from serial import Serial
 
 
 class Controller:
