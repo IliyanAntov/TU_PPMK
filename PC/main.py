@@ -6,10 +6,7 @@ from Player import Player
 
 
 def main():
-
     pygame.init()
-    player = Player()
-
     clock = pygame.time.Clock()
 
     # controller = Controller()
@@ -17,26 +14,41 @@ def main():
     # controller_input_thread = threading.Thread(target=Controller.read_input, args=(controller,))
     # controller_input_thread.start()
     # controller_button_states = (controller.but1, controller.but2, controller.butj)
+
+    player = Player()
     level = Level(1)
+    # controller.write_score(Game.score)
+
+    # Main loop
     while True:
         frame_time = clock.tick(Game.fps)
 
+        # Check if the player was hit by an enemy projectile
+        if level.check_player_hit(player):
+            Level.game_over_dialog()
+            Game.score = 0
+            # controller.write_score(Game.score)
+            level = Level(1)
+            continue
+
+        # Check if any enemies were hit by player projectiles
+        for projectile in player.projectiles:
+            hit = level.check_enemy_hit(projectile)
+            if hit:
+                player.projectiles.remove(projectile)
+                if level.check_completion():
+                    Game.score += level.num * 1000
+                    # controller.write_score(Game.score)
+                    level = Level(level.num + 1)
+                    print(Game.score)
+                    continue
+
+        # Draw the player and all enemies on screen
+        Game.screen.fill((0, 0, 0))
         level.move_enemies(frame_time)
         level.draw(frame_time)
         player.draw(frame_time)
         pygame.display.update()
-
-        if level.check_player_hit(player):
-            Game.score = 0
-
-            Game.screen.fill((0, 0, 0))
-            level = Level(1)
-            level.draw(frame_time)
-            player = Player()
-            player.draw(frame_time)
-            pygame.display.update()
-
-            Level.game_over_dialog()
 
         events = pygame.event.get()
         for event in events:
@@ -67,16 +79,6 @@ def main():
             player.move(0, 50, frame_time)
         if keys[pygame.K_w]:
             player.move(0, -50, frame_time)
-
-        Game.screen.fill((0, 0, 0))
-
-        for projectile in player.projectiles:
-            hit = level.check_enemy_hit(projectile)
-            if hit:
-                player.projectiles.remove(projectile)
-
-        if level.check_completion():
-            level = Level(level.num + 1)
 
 
 if __name__ == "__main__":

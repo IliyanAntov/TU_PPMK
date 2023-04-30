@@ -8,7 +8,7 @@ import serial.tools.list_ports
 
 class Controller:
     def __init__(self):
-        self.connection = None
+        self.connection: serial.Serial = Controller.connect()
         self.x = 2048
         self.y = 2048
         self.but1 = 0
@@ -16,7 +16,8 @@ class Controller:
         self.butj = 0
         self.stop = False
 
-    def connect(self):
+    @staticmethod
+    def connect():
         dialog_root = Tk()
         dialog_root.title("Choose COM port:")
         dialog_root.geometry("500x100")
@@ -41,7 +42,7 @@ class Controller:
         if not serial_connection.isOpen():
             serial_connection.open()
 
-        self.connection = serial_connection
+        return serial_connection
 
     def disconnect(self):
         self.connection.close()
@@ -68,7 +69,5 @@ class Controller:
             except:
                 pass
 
-
-
-
-
+    def write_score(self, score):
+        self.connection.write(score)

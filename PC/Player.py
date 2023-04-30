@@ -9,7 +9,7 @@ from Projectile import Projectile
 class Player(pygame.sprite.Sprite):
 
     def __init__(self):
-        self.size = (16*4, 16*4)
+        self.size = (16 * 4, 16 * 4)
         self.default_pos = (368, 700)
         self.speed = 400
         self.deadzone = (-50, 50)
@@ -44,7 +44,7 @@ class Player(pygame.sprite.Sprite):
         if movement_vector.length() == 0:
             return
 
-        movement_vector.scale_to_length(self.speed*(frame_time/1000))
+        movement_vector.scale_to_length(self.speed * (frame_time / 1000))
         self.pos.x += movement_vector.x
         self.pos.y += movement_vector.y
 

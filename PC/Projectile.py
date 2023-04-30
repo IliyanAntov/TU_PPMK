@@ -17,7 +17,7 @@ class Projectile:
 
     def move(self, frame_time, direction):
         if direction == "up":
-            self.pos.y -= self.speed * (frame_time/1000)
+            self.pos.y -= self.speed * (frame_time / 1000)
         elif direction == "down":
             self.pos.y += self.speed * (frame_time / 1000)
 

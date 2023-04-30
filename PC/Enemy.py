@@ -10,14 +10,14 @@ from Projectile import Projectile
 class Enemy(pygame.sprite.Sprite):
     image = pygame.image.load(os.path.join('imgs', 'enemy.png'))
     default_speed = 200
-    size = (16*4, 10*4)
+    default_size = (16 * 4, 10 * 4)
     default_pos = (0, 0)
     min_x = Game.display_size.x / 5
 
     def __init__(self, spawn_x, spawn_y):
         pygame.sprite.Sprite.__init__(self)
 
-        self.size = Enemy.size
+        self.size = Enemy.default_size
         self.image = pygame.transform.scale(Enemy.image, self.size)
         self.speed = Enemy.default_speed
 
@@ -36,7 +36,6 @@ class Enemy(pygame.sprite.Sprite):
             self.projectiles.append(projectile)
 
         for projectile in list(self.projectiles):
-
             projectile_destroyed = projectile.move(frame_time, "down")
             if projectile_destroyed:
                 self.projectiles.remove(projectile)
@@ -49,7 +48,7 @@ class Enemy(pygame.sprite.Sprite):
         if movement_vector.length() == 0:
             return
 
-        movement_vector.scale_to_length(self.speed*(frame_time/1000))
+        movement_vector.scale_to_length(self.speed * (frame_time / 1000))
         self.pos.x += movement_vector.x
         self.pos.y += movement_vector.y
 
@@ -64,4 +63,3 @@ class Enemy(pygame.sprite.Sprite):
             self.pos.y = (Game.display_size.y - self.rect.height)
 
         self.rect.topleft = self.pos
-

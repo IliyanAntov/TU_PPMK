@@ -1,6 +1,4 @@
-import copy
 import itertools
-import math
 import tkinter
 from tkinter import Tk, Button
 
@@ -28,16 +26,15 @@ class Level:
         for i in range(self.num):
             enemies.append([])
             current_x = Enemy.min_x
-            current_y = i * (Enemy.size[1] + Level.enemy_offset)
+            current_y = i * (Enemy.default_size[1] + Level.enemy_offset)
 
             for j in range(self.enemy_row_length):
-
                 enemy = Enemy(spawn_x=current_x,
                               spawn_y=current_y)
 
                 enemies[i].append(enemy)
 
-                current_x += Enemy.size[0] + Level.enemy_offset
+                current_x += Enemy.default_size[0] + Level.enemy_offset
 
         return enemies
 
@@ -54,7 +51,7 @@ class Level:
             # If the enemies have reached the end of the screen, move them one row down
             if rightmost_enemy.rect.right >= Game.display_size.x:
                 for enemy in itertools.chain.from_iterable(self.enemies):
-                    enemy.pos.y += Enemy.size[1]
+                    enemy.pos.y += Enemy.default_size[1]
                     enemy.rect.top = enemy.pos.y
                 self.movement_direction = "left"
 
@@ -77,7 +74,7 @@ class Level:
             # If the enemies have reached the end of the screen, move them one row down
             if leftmost_enemy.rect.left <= 0:
                 for enemy in itertools.chain.from_iterable(self.enemies):
-                    enemy.pos.y += Enemy.size[1]
+                    enemy.pos.y += enemy.default_size[1]
                     enemy.rect.top = enemy.pos.y
                     self.movement_direction = "right"
 
