@@ -41,7 +41,7 @@ def main():
         # Check if the player was hit by an enemy projectile
         if level.check_player_hit(player):
             # Display the game over dialog
-            Level.game_over_dialog()
+            Level.game_over_dialog(controller)
             # If the "Retry" button was pressed, reset the score and write it to the controller
             Game.score = 0
             controller.write_score(Game.score)
@@ -94,11 +94,12 @@ def main():
                 # Exit the program
                 exit()
 
+        # Save the current states of all controller buttons
+        controller_button_states = (controller.but1, controller.but2, controller.butj)
+
         # If the "shoot" button was pressed (where it was not previously), shoot a projectile from the player
         if controller.but2 == 0 and controller_button_states[1] != 0:
             player.shoot()
-        # Save the current states of all controller buttons
-        controller_button_states = (controller.but1, controller.but2, controller.butj)
 
         # Map the X and Y movement values received from the controller (numbers between 0 and 4096) to values used by
         # the player movement function (numbers between -2048 and 2048)

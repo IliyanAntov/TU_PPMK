@@ -86,4 +86,4 @@ class Controller:
 
     def write_score(self, score: int):
         # Write the game score to the controller
-        self.connection.write(data=score)
+        self.connection.write(data=str(score))

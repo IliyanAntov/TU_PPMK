@@ -3,6 +3,7 @@ from tkinter import Tk, Button
 
 import pygame
 
+from Controller import Controller
 from Enemy import Enemy
 from Game import Game
 from Player import Player
@@ -126,7 +127,7 @@ class Level:
         # If no collision was detected, return False
         return False
 
-    def check_player_hit(self, player: Player):
+    def check_player_hit(self, player: Player) -> bool:
         # Iterate through the list of enemies in the level
         for enemy in self.enemies:
             # If the player has collided with an enemy, return True
@@ -144,7 +145,7 @@ class Level:
         # If no collision was detected, return False
         return False
 
-    def check_completion(self):
+    def check_completion(self) -> bool:
         # If no enemies are left in the level, return True
         if not self.enemies:
             return True
@@ -153,7 +154,7 @@ class Level:
             return False
 
     @staticmethod
-    def game_over_dialog():
+    def game_over_dialog(controller: Controller):
         # Create the dialog box window
         dialog_root = Tk()
         dialog_root.title("Game Over!")
@@ -166,16 +167,20 @@ class Level:
         retry_button = Button(dialog_root, text="Retry", command=dialog_root.destroy)
         retry_button.pack(padx=10, pady=10, fill=tkinter.X, side=tkinter.LEFT, expand=True)
         # Create a quit button that exits the game
-        quit_button = Button(dialog_root, text="Quit", command=(lambda: Level.game_over(dialog_root)))
+        quit_button = Button(dialog_root, text="Quit", command=(lambda: Level.game_over(dialog_root, controller)))
         quit_button.pack(padx=10, pady=10, fill=tkinter.X, side=tkinter.RIGHT, expand=True)
 
         # Display the dialog and wait for input
         dialog_root.mainloop()
 
     @staticmethod
-    def game_over(tkinter_root):
+    def game_over(tkinter_root, controller: Controller):
         # Close the tkinter GUI
         tkinter_root.quit()
+        # Stop the input thread
+        controller.stop = True
+        # Disconnect the controller
+        controller.disconnect()
         # Close the pygame window
         pygame.quit()
         # Exit the program
